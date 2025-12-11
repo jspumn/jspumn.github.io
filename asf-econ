@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>ASF Economic Impact Calculator</title>
+
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        margin: 30px;
+        max-width: 900px;
+    }
+    h1, h2 {
+        color: #333;
+    }
+    .input-block {
+        margin-bottom: 15px;
+    }
+    label {
+        font-weight: bold;
+    }
+    input {
+        width: 250px;
+        padding: 5px;
+    }
+    button {
+        margin-top: 20px;
+        padding: 10px 20px;
+        background: #4677f5;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 16px;
+    }
+    .output {
+        margin-top: 25px;
+        padding: 18px;
+        background: #f9f9f9;
+        border: 1px solid #aaa;
+        border-radius: 8px;
+    }
+</style>
+
+</head>
+
+<body>
+
+<h1>ASF Economic Impact Calculator</h1>
+<p>This tool estimates direct economic losses caused by an African Swine Fever (ASF) outbreak.  
+The model calculates costs from depopulation, compensation, laboratory testing, carcass disposal, official staff activity, and movement control.</p>
+
+<hr>
+
+<h2>Adjust Parameters</h2>
+
+<div class="input-block">
+    <label>Number of farms culled:</label><br>
+    <input type="number" id="farmsCulled" value="10" min="0">
+</div>
+
+<div class="input-block">
+    <label>Average pigs per farm:</label><br>
+    <input type="number" id="pigsPerFarm" value="500" min="1">
+</div>
+
+<div class="input-block">
+    <label>Compensation per pig (NTD):</label><br>
+    <input type="number" id="compensation" value="8000" min="0">
+</div>
+
+<div class="input-block">
+    <label>Depopulation operational cost per pig (NTD):</label><br>
+    <input type="number" id="munitionCost" value="150" min="0">
+</div>
+
+<div class="input-block">
+    <label>Carcass disposal cost per pig (NTD):</label><br>
+    <input type="number" id="carcassCost" value="500" min="0">
+</div>
+
+<div class="input-block">
+    <label>Number of farms tested:</label><br>
+    <input type="number" id="farmsTested" value="20" min="0">
+</div>
+
+<div class="input-block">
+    <label>Lab test cost per sample (NTD):</label><br>
+    <input type="number" id="labCost" value="900" min="0">
+</div>
+
+<div class="input-block">
+    <label>PPE cost per sampling event (NTD):</label><br>
+    <input type="number" id="ppeCost" value="250" min="0">
+</div>
+
+<div class="input-block">
+    <label>Official visits per culled farm:</label><br>
+    <input type="number" id="visitsPerFarm" value="5" min="0">
+</div>
+
+<div class="input-block">
+    <label>Cost per official visit (NTD):</label><br>
+    <input type="number" id="staffCost" value="1200" min="0">
+</div>
+
+<div class="input-block">
+    <label>Number of movement control checkpoints:</label><br>
+    <input type="number" id="checkpoints" value="4" min="0">
+</div>
+
+<div class="input-block">
+    <label>Checkpoint daily cost (NTD):</label><br>
+    <input type="number" id="checkpointCost" value="6000" min="0">
+</div>
+
+<div class="input-block">
+    <label>Movement control duration (days):</label><br>
+    <input type="number" id="daysControl" value="30" min="1">
+</div>
+
+<button onclick="calculateCosts()">Calculate</button>
+
+<hr>
+
+<h2>Economic Output</h2>
+<div id="output" class="output"></div>
+
+<script>
+/* ----------------------------------------------------
+   ASF ECONOMIC COST FORMULAS
+   ----------------------------------------------------
+   Let:
+     F  = number of farms culled
+     P  = pigs per farm
+     Cp = compensation per pig
+     Cd = depopulation operational cost per pig
+     Cc = carcass disposal cost per pig
+
+     Ft   = number of farms tested
+     Clab = lab test cost
+     Cppe = PPE cost per sampling
+
+     V  = official visits per culled farm
+     Cv = cost per visit
+
+     M  = movement control checkpoints
+     Cm = checkpoint cost per day
+     D  = number of days of movement control
+
+   Total pigs culled = F × P
+
+   Cost components:
+     Compensation               = (F × P) × Cp
+     Depopulation              = (F × P) × Cd
+     Carcass disposal          = (F × P) × Cc
+     Laboratory testing        = Ft × (Clab + Cppe)
+     Official staff            = F × V × Cv
+     Movement control          = M × Cm × D
+
+   Total cost = SUM(all components)
+---------------------------------------------------- */
+
+function calculateCosts() {
+
+    const F  = Number(document.getElementById("farmsCulled").value);
+    const P  = Number(document.getElementById("pigsPerFarm").value);
+    const Cp = Number(document.getElementById("compensation").value);
+    const Cd = Number(document.getElementById("munitionCost").value);
+    const Cc = Number(document.getElementById("carcassCost").value);
+
+    const Ft   = Number(document.getElementById("farmsTested").value);
+    const Clab = Number(document.getElementById("labCost").value);
+    const Cppe = Number(document.getElementById("ppeCost").value);
+
+    const V  = Number(document.getElementById("visitsPerFarm").value);
+    const Cv = Number(document.getElementById("staffCost").value);
+
+    const M  = Number(document.getElementById("checkpoints").value);
+    const Cm = Number(document.getElementById("checkpointCost").value);
+    const D  = Number(document.getElementById("daysControl").value);
+
+    const pigsTotal = F * P;
+
+    const costComp  = pigsTotal * Cp;
+    const costDepop = pigsTotal * Cd;
+    const costCarc  = pigsTotal * Cc;
+    const costLab   = Ft * (Clab + Cppe);
+    const costStaff = F * V * Cv;
+    const costMove  = M * Cm * D;
+
+    const totalCost = costComp + costDepop + costCarc + costLab + costStaff + costMove;
+
+    document.getElementById("output").innerHTML = `
+        <h3>Total Economic Cost (NTD): <strong>${totalCost.toLocaleString()}</strong></h3>
+        <p><strong>Compensation:</strong> ${costComp.toLocaleString()}</p>
+        <p><strong>Depopulation:</strong> ${costDepop.toLocaleString()}</p>
+        <p><strong>Carcass Disposal:</strong> ${costCarc.toLocaleString()}</p>
+        <p><strong>Laboratory Testing:</strong> ${costLab.toLocaleString()}</p>
+        <p><strong>Official Staff:</strong> ${costStaff.toLocaleString()}</p>
+        <p><strong>Movement Control:</strong> ${costMove.toLocaleString()}</p>
+    `;
+}
+</script>
+
+</body>
+</html>
