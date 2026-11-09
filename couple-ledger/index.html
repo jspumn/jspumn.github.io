@@ -37,7 +37,7 @@ const handled=new Set(batch.map(op=>op.qid));pending=pending.filter(op=>!handled
 data=result;if(!save())throw Error('雲端同步成功，但無法更新本機資料；請下載備份');render();cloudStatus('GitHub 已同步 ✓ '+merged.length+' 筆紀錄'+(pending.length?'；另外 '+pending.length+' 筆待上傳':''));return}
 throw Error('GitHub 有其他裝置同時更新，請稍後再試')}catch(e){cloudStatus('同步失敗：'+e.message+'。目前有 '+pending.length+' 筆待上傳；本機記錄仍保留。')}finally{syncBusy=false;if(cloudToken&&pending.length)setTimeout(()=>syncNow(),15000)}}
 $('cloudRepo').value=localStorage.getItem(CLOUD_REPO_KEY)||'jspumn/couple-ledger-data';
-$('cloudConnect').onclick=()=>{const token=$('cloudToken').value.trim();if(!token){cloudStatus('請先輸入 GitHub Token');return}try{cloudEndpoint()}catch(e){cloudStatus(e.message);return}cloudToken=token;localStorage.setItem(CLOUD_REPO_KEY,cloudRepo());$('cloudToken').value='';syncNow()};
+$('cloudConnect').onclick=()=>{const token=$('cloudToken').value.trim();if(!token){cloudStatus('請先輸入 GitHub Token');return}try{cloudEndpoint()}catch(e){cloudStatus(e.message);return}cloudToken=token;const firstLinkKey='jesper-vivi-linked-'+cloudRepo();if(!localStorage.getItem(firstLinkKey)&&data.length&&!pending.length){for(const record of data)pending.push({type:'put',record,qid:uid()});try{localStorage.setItem(QUEUE_KEY,JSON.stringify(pending))}catch(e){cloudStatus('無法排入初次同步，請先下載備份');cloudToken='';return}}localStorage.setItem(firstLinkKey,'1');localStorage.setItem(CLOUD_REPO_KEY,cloudRepo());$('cloudToken').value='';syncNow()};
 $('cloudRefresh').onclick=()=>syncNow();
 $('cloudDisconnect').onclick=()=>{cloudToken='';$('cloudToken').value='';cloudStatus('已中斷連線。資料仍保存在本機。')};
 window.addEventListener('online',()=>{if(cloudToken)syncNow()});
