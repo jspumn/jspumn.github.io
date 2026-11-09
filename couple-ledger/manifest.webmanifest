@@ -1,0 +1,20 @@
+{
+  "id": "/couple-ledger/",
+  "name": "Jesper & Vivi · Our Money",
+  "short_name": "J & V",
+  "description": "北歐風雙人單機記帳與分帳",
+  "start_url": "/couple-ledger/",
+  "scope": "/couple-ledger/",
+  "display": "standalone",
+  "background_color": "#f6f4ef",
+  "theme_color": "#e5ebe3",
+  "lang": "zh-Hant",
+  "icons": [
+    {
+      "src": "./icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
